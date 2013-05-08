@@ -6,9 +6,22 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="32"/>
+            <RowDefinition Height="30"/>
+            <!--RowDefinition Height="30"/-->
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+
+        <!-- Create a combo box -->
+        
+        <!--StackPanel Orientation="Horizontal" Grid.Row="0" Background="DarkGray">
+            <TextBlock Name ="txtMessage" Margin="5,5" Foreground="#EEE" Background="DarkGray"  Text=""/>
+        </StackPanel-->
+        
+        <!-- Create a combo box -->
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Background="DarkOrange">
+            <TextBlock Margin="5,5" Foreground="#EEE" Background="DarkOrange"  Text="Select stock:"/>
+            <ComboBox x:Name="cboStock" MinWidth="140" Margin="5,3" SelectionChanged="cboStockChanged"/>
+        </StackPanel>
         <!-- Create the chart surface -->
         <SciChart:SciChartSurface Name="sciChart" Grid.Row="1" SciChart:ThemeManager.Theme="BlackSteel">
 
@@ -41,11 +54,5 @@
                 </SciChart:ModifierGroup>
             </SciChart:SciChartSurface.ChartModifier>
         </SciChart:SciChartSurface>
-
-        <!-- Create a combo box -->
-        <StackPanel Orientation="Horizontal" Grid.Row="0" Background="DarkOrange">
-            <TextBlock Margin="5,5" Foreground="#EEE" Background="DarkOrange"  Text="Select stock:"/>
-            <ComboBox x:Name="cboStock" MinWidth="140" Margin="5,3" SelectionChanged="cboStockChanged"/>
-        </StackPanel>
     </Grid>
 </UserControl>

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Collections.Generic;
 
 using Abt.Controls.SciChart;
 using Abt.Controls.SciChart.Utility;
@@ -58,14 +59,22 @@ namespace TradingVisualizationAssignment
         //Return relevant data set
         private DataSeriesSet<DateTime, double> ReadStockData(String sFileName)
         {
+            //local variables and structures
+            string sFile;
+            int nRow = 0;
+            string sStockFile = sLocation + "\\" + sFileName;
+
+            DateTime xAxis;
+            double dOpen, dHigh, dLow, dClose;
+            int nVolume;
+            List<Tuple<DateTime, double, double, double, double, int>> listStock = new List<Tuple<DateTime, double, double, double, double, int>>();
+
             //Data structure to return
             var dataSeriesSet = new DataSeriesSet<DateTime, double>();
             var series = dataSeriesSet.AddSeries<OhlcDataSeries<DateTime, double>>();
 
             //local variables declarations
-            string sFile;
-            int nRow = 0;
-            string sStockFile = sLocation + "\\" + sFileName;
+
 
             //reading stock file
             using (StreamReader sr = new StreamReader(sStockFile))
@@ -74,11 +83,45 @@ namespace TradingVisualizationAssignment
             string[] rows = sFile.Split(('\n'));
             foreach (string row in rows)
             {
-                if ((nRow++ == 0) || (row == "")) continue;
+                if (row == "") continue;
                 string[] columns = row.Split((','));
-                series.Append(DateTime.Parse(columns[0]), Convert.ToDouble(columns[1]), Convert.ToDouble(columns[2]),
-                    Convert.ToDouble(columns[3]), Convert.ToDouble(columns[4]));
+                if (nRow++ == 0) //(Sort of) Check of the data file structure
+                {
+                    if (!columns[0].Substring(0, 4).Equals("DATE", StringComparison.InvariantCultureIgnoreCase) ||
+                    !columns[1].Substring(0, 4).Equals("OPEN", StringComparison.InvariantCultureIgnoreCase) ||
+                    !columns[2].Substring(0, 4).Equals("HIGH", StringComparison.InvariantCultureIgnoreCase) ||
+                    !columns[3].Substring(0, 3).Equals("LOW", StringComparison.InvariantCultureIgnoreCase) ||
+                    !columns[4].Substring(0, 5).Equals("CLOSE", StringComparison.InvariantCultureIgnoreCase) ||
+                    !columns[5].Substring(0, 6).Equals("VOLUME", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        MessageBoxResult result = MessageBox.Show("Your source data file doesn't have the required structure!\nPlease, re-check your file.\nAborting!", "Data structure error!"); 
+                        dataSeriesSet = null;
+                        break;
+                    }
+                    else continue;
+                }
+                try //Check of the source data types
+                {
+                    xAxis = DateTime.Parse(columns[0]);
+                    dOpen = Convert.ToDouble(columns[1]);
+                    dHigh = Convert.ToDouble(columns[2]);
+                    dLow = Convert.ToDouble(columns[3]);
+                    dClose = Convert.ToDouble(columns[4]);
+                    nVolume = Convert.ToInt32(columns[5]);
+
+                    //Add the row to the list
+                    listStock.Add(new Tuple<DateTime, double, double, double, double, int> (xAxis, dOpen, dHigh, dLow, dClose, nVolume));
+                }
+                catch
+                {
+                    MessageBoxResult result = MessageBox.Show("Your source file contains some data which is not of the required data type!\nPlease, re-check your file.\nAborting!", "Data type error!"); 
+                    dataSeriesSet = null;
+                    break;
+                }
             }
+            listStock.Sort(Comparer<Tuple<DateTime, double, double, double, double, int>>.Default); //sort and set as source
+            foreach(Tuple<DateTime, double, double, double, double, int> newLine in listStock)
+                series.Append(newLine.Item1, newLine.Item2, newLine.Item3, newLine.Item4, newLine.Item5);
             return dataSeriesSet;
         }
     }
