@@ -2,19 +2,27 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"        
     xmlns:SciChart="clr-namespace:Abt.Controls.SciChart;assembly=Abt.Controls.SciChart.Wpf">
-    <!--Loaded="MainWindow_OnLoaded"-->
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="32"/>
+            <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+
+        <!-- Create a combo and a check box -->
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Background="DarkOrange">
+            <TextBlock Margin="5,5" Foreground="#EEE" Background="DarkOrange"  Text="Select stock:"/>
+            <ComboBox x:Name="cboStock" MinWidth="140" Margin="5,3" SelectionChanged="cboStockChanged"/>
+            <CheckBox Margin="5,5" Foreground="#EEE" Content="Show stock volume in millions" IsChecked="True"
+                      Checked="cbChecked" Unchecked="cbChecked"></CheckBox>
+        </StackPanel>
         <!-- Create the chart surface -->
         <SciChart:SciChartSurface Name="sciChart" Grid.Row="1" SciChart:ThemeManager.Theme="BlackSteel">
 
             <!-- Declare RenderableSeries -->
             <SciChart:SciChartSurface.RenderableSeries>
                 <SciChart:FastCandlestickRenderableSeries />
+                <SciChart:FastLineRenderableSeries SeriesColor="#FF1919" />
             </SciChart:SciChartSurface.RenderableSeries>
 
             <!-- Create an X Axis -->
@@ -41,11 +49,5 @@
                 </SciChart:ModifierGroup>
             </SciChart:SciChartSurface.ChartModifier>
         </SciChart:SciChartSurface>
-
-        <!-- Create a combo box -->
-        <StackPanel Orientation="Horizontal" Grid.Row="0" Background="DarkOrange">
-            <TextBlock Margin="5,5" Foreground="#EEE" Background="DarkOrange"  Text="Select stock:"/>
-            <ComboBox x:Name="cboStock" MinWidth="140" Margin="5,3" SelectionChanged="cboStockChanged"/>
-        </StackPanel>
     </Grid>
 </UserControl>

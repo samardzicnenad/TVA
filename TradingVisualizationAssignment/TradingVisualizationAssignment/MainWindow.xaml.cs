@@ -11,6 +11,7 @@ namespace TradingVisualizationAssignment
     public partial class MainWindow : UserControl
     {
         public string sLocation;
+        public Boolean inMillions = true;
 
         public MainWindow()
         {
@@ -55,12 +56,24 @@ namespace TradingVisualizationAssignment
             sciChart.ZoomExtents();
         }
 
+        //Defines the way of volume chart presentation
+        private void cbChecked(object sender, RoutedEventArgs e)
+        {
+            inMillions = ((CheckBox)sender).IsChecked == true;
+            if (cboStock.SelectedItem != null)
+            {
+                sciChart.DataSet = ReadStockData(cboStock.SelectedItem.ToString() + ".csv");
+                sciChart.ZoomExtents();
+            }
+        }
+
         //Return relevant data set
         private DataSeriesSet<DateTime, double> ReadStockData(String sFileName)
         {
             //Data structure to return
             var dataSeriesSet = new DataSeriesSet<DateTime, double>();
             var series = dataSeriesSet.AddSeries<OhlcDataSeries<DateTime, double>>();
+            var seriesLine = dataSeriesSet.AddSeries();
 
             //local variables declarations
             string sFile;
@@ -78,6 +91,14 @@ namespace TradingVisualizationAssignment
                 string[] columns = row.Split((','));
                 series.Append(DateTime.Parse(columns[0]), Convert.ToDouble(columns[1]), Convert.ToDouble(columns[2]),
                     Convert.ToDouble(columns[3]), Convert.ToDouble(columns[4]));
+                if (inMillions)
+                {
+                    seriesLine.Append(DateTime.Parse(columns[0]), Convert.ToDouble(columns[5]) / 1000000);
+                }
+                else
+                {
+                    seriesLine.Append(DateTime.Parse(columns[0]), Convert.ToDouble(columns[5]));
+                }
             }
             return dataSeriesSet;
         }
