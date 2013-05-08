@@ -10,28 +10,48 @@ namespace TradingVisualizationAssignment
 {
     public partial class MainWindow : UserControl
     {
-        /*//Set for the purpose of scaling the charts - won't need them
-        public DateTime minDate, maxDate;
-        public double minPrice, maxPrice;*/
+        public string sLocation;
 
         public MainWindow()
         {
+            Boolean bFirst = true;
+            string sSelectedItem = "";
+
             InitializeComponent();
 
-            //temporary data sources list
-            string[] arr1 = new string[] {"goog.csv", "citi.csv", "msft.csv", "csco.csv"};
-            foreach (string stock in arr1)
+            //Open folder dialog
+            System.Windows.Forms.FolderBrowserDialog fbd = new System.Windows.Forms.FolderBrowserDialog();
+            fbd.Description = "Please, select the folder which contains your stock market data files.";
+            System.Windows.Forms.DialogResult drResult = fbd.ShowDialog();
+            sLocation = fbd.SelectedPath;
+
+            while (fbd.SelectedPath == "")
             {
-                cboStock.Items.Add(stock);
+                fbd = new System.Windows.Forms.FolderBrowserDialog();
+                fbd.Description = "You have to choose the folder which contains your stock market data files before you continue!";
+                drResult = fbd.ShowDialog();
+                sLocation = fbd.SelectedPath;
             }
-            //Start from the first one
-            cboStock.SelectedItem = "goog.csv";
+
+            //Loading all .csv files into the combo box
+            foreach (string stock in Directory.EnumerateFiles(fbd.SelectedPath, "*.csv"))
+            {
+                string stockName = stock.Substring(stock.LastIndexOf("\\") + 1, stock.Length - (stock.LastIndexOf("\\") + 1) - 4);
+                cboStock.Items.Add(stockName);
+                //Load the first file - optional...can work without setting the SelectedItem...everything below may be omitted
+                if (bFirst)
+                {
+                    sSelectedItem = stockName;
+                    bFirst = false;
+                }
+            }
+            cboStock.SelectedItem = sSelectedItem;
         }
 
         //Changing the stock gives different data
         private void cboStockChanged(object sender, SelectionChangedEventArgs e)
         {
-            sciChart.DataSet = ReadStockData(cboStock.SelectedItem.ToString());
+            sciChart.DataSet = ReadStockData(cboStock.SelectedItem.ToString() + ".csv");
             sciChart.ZoomExtents();
         }
 
@@ -41,74 +61,23 @@ namespace TradingVisualizationAssignment
             //Data structure to return
             var dataSeriesSet = new DataSeriesSet<DateTime, double>();
             var series = dataSeriesSet.AddSeries<OhlcDataSeries<DateTime, double>>();
-            series.SeriesName = "Stock chart";
 
             //local variables declarations
-            String sFile, sRow, sEl;
-            int nRow = 0, nCol, nIndex, nVolume;
-            double priceOpen = 0, priceHigh = 0, priceLow = 0, priceClose = 0;
-            DateTime xAxis = DateTime.Parse("01/01/1900");
-            String sStockFile = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "\\" + sFileName;
+            string sFile;
+            int nRow = 0;
+            string sStockFile = sLocation + "\\" + sFileName;
 
             //reading stock file
             using (StreamReader sr = new StreamReader(sStockFile))
                 sFile = sr.ReadToEnd();
             //parsing the file
-            while (sFile != "")
+            string[] rows = sFile.Split(('\n'));
+            foreach (string row in rows)
             {
-                nIndex = sFile.IndexOf("\n");
-                sRow = sFile.Substring(0, nIndex);
-                sFile = sFile.Substring(nIndex + 1);
-                //parsing the header - no need to right now...could be done if needed
-                if (nRow++ == 0) continue;
-                //parsing row by row
-                nCol = 1;
-                while (sRow != "")
-                {
-                    nIndex = sRow.IndexOf(",");
-                    if (nIndex == -1 && nCol == 6) //needs better approach probably - won't waste time right now
-                    {
-                        sEl = sRow;
-                        sRow = "";
-                    }
-                    else
-                    {
-                        sEl = sRow.Substring(0, nIndex);
-                        sRow = sRow.Substring(nIndex + 1);
-                    }
-                    switch (nCol++)
-                    {
-                        case 1:
-                            xAxis = DateTime.Parse(sEl);
-                            /*if (xAxis > maxDate) maxDate = xAxis;
-                            if (xAxis < minDate) minDate = xAxis;*/
-                            break;
-                        case 2:
-                            priceOpen = Convert.ToDouble(sEl);
-                            /*if (priceOpen > maxPrice) maxPrice = priceOpen;
-                            if (priceOpen < minPrice) minPrice = priceOpen;*/
-                            break;
-                        case 3:
-                            priceHigh = Convert.ToDouble(sEl);
-                            /*if (priceHigh > maxPrice) maxPrice = priceHigh;
-                            if (priceHigh < minPrice) minPrice = priceHigh;*/
-                            break;
-                        case 4:
-                            priceLow = Convert.ToDouble(sEl);
-                            /*if (priceLow > maxPrice) maxPrice = priceLow;
-                            if (priceLow < minPrice) minPrice = priceLow;*/
-                            break;
-                        case 5:
-                            priceClose = Convert.ToDouble(sEl);
-                            /*if (priceClose > maxPrice) maxPrice = priceClose;
-                            if (priceClose < minPrice) minPrice = priceClose;*/
-                            break;
-                        case 6:
-                            nVolume = Convert.ToInt32(sEl); //Don't use it at the time
-                            break;
-                    }
-                }
-                series.Append(xAxis, priceOpen, priceHigh, priceLow, priceClose);
+                if ((nRow++ == 0) || (row == "")) continue;
+                string[] columns = row.Split((','));
+                series.Append(DateTime.Parse(columns[0]), Convert.ToDouble(columns[1]), Convert.ToDouble(columns[2]),
+                    Convert.ToDouble(columns[3]), Convert.ToDouble(columns[4]));
             }
             return dataSeriesSet;
         }
