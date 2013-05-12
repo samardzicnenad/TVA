@@ -73,9 +73,6 @@ namespace TradingVisualizationAssignment
             var dataSeriesSet = new DataSeriesSet<DateTime, double>();
             var series = dataSeriesSet.AddSeries<OhlcDataSeries<DateTime, double>>();
 
-            //local variables declarations
-
-
             //reading stock file
             using (StreamReader sr = new StreamReader(sStockFile))
                 sFile = sr.ReadToEnd();
