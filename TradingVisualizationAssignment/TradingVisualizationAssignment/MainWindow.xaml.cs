@@ -12,6 +12,7 @@ namespace TradingVisualizationAssignment
     public partial class MainWindow : UserControl
     {
         public string sLocation;
+        public Boolean inMillions = true;
 
         public MainWindow()
         {
@@ -56,10 +57,30 @@ namespace TradingVisualizationAssignment
             sciChart.ZoomExtents();
         }
 
+        //Defines the way of volume chart presentation
+        private void cbChecked(object sender, RoutedEventArgs e)
+        {
+            inMillions = ((CheckBox)sender).IsChecked == true;
+            if (cboStock.SelectedItem != null)
+            {
+                sciChart.DataSet = ReadStockData(cboStock.SelectedItem.ToString() + ".csv");
+                sciChart.ZoomExtents();
+            }
+        }
+
         //Return relevant data set
         private DataSeriesSet<DateTime, double> ReadStockData(String sFileName)
         {
+<<<<<<< HEAD
             //local variables and structures
+=======
+            //Data structure to return
+            var dataSeriesSet = new DataSeriesSet<DateTime, double>();
+            var series = dataSeriesSet.AddSeries<OhlcDataSeries<DateTime, double>>();
+            var seriesLine = dataSeriesSet.AddSeries();
+
+            //local variables declarations
+>>>>>>> origin/VolumeTask
             string sFile;
             int nRow = 0;
             string sStockFile = sLocation + "\\" + sFileName;
@@ -82,6 +103,7 @@ namespace TradingVisualizationAssignment
             {
                 if (row == "") continue;
                 string[] columns = row.Split((','));
+<<<<<<< HEAD
                 if (nRow++ == 0) //(Sort of) Check of the data file structure
                 {
                     if (!columns[0].Substring(0, 4).Equals("DATE", StringComparison.InvariantCultureIgnoreCase) ||
@@ -114,6 +136,17 @@ namespace TradingVisualizationAssignment
                     MessageBoxResult result = MessageBox.Show("Your source file contains some data which is not of the required data type!\nPlease, re-check your file.\nAborting!", "Data type error!"); 
                     dataSeriesSet = null;
                     break;
+=======
+                series.Append(DateTime.Parse(columns[0]), Convert.ToDouble(columns[1]), Convert.ToDouble(columns[2]),
+                    Convert.ToDouble(columns[3]), Convert.ToDouble(columns[4]));
+                if (inMillions)
+                {
+                    seriesLine.Append(DateTime.Parse(columns[0]), Convert.ToDouble(columns[5]) / 1000000);
+                }
+                else
+                {
+                    seriesLine.Append(DateTime.Parse(columns[0]), Convert.ToDouble(columns[5]));
+>>>>>>> origin/VolumeTask
                 }
             }
             listStock.Sort(Comparer<Tuple<DateTime, double, double, double, double, int>>.Default); //sort and set as source

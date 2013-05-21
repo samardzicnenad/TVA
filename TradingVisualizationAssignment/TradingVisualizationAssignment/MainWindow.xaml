@@ -9,6 +9,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
+<<<<<<< HEAD
     
         <!-- Create a combo box -->
         <StackPanel Orientation="Horizontal" Grid.Row="0" Background="#FF364381">
@@ -16,12 +17,23 @@
             <ComboBox x:Name="cboStock" MinWidth="140" Margin="5,3" SelectionChanged="cboStockChanged"/>
         </StackPanel>
         
+=======
+
+        <!-- Create a combo and a check box -->
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Background="DarkOrange">
+            <TextBlock Margin="5,5" Foreground="#EEE" Background="DarkOrange"  Text="Select stock:"/>
+            <ComboBox x:Name="cboStock" MinWidth="140" Margin="5,3" SelectionChanged="cboStockChanged"/>
+            <CheckBox Margin="5,5" Foreground="#EEE" Content="Show stock volume in millions" IsChecked="True"
+                      Checked="cbChecked" Unchecked="cbChecked"></CheckBox>
+        </StackPanel>
+>>>>>>> origin/VolumeTask
         <!-- Create the chart surface -->
         <SciChart:SciChartSurface Name="sciChart" Grid.Row="1" SciChart:ThemeManager.Theme="Electric">
     
             <!-- Declare RenderableSeries -->
             <SciChart:SciChartSurface.RenderableSeries>
                 <SciChart:FastCandlestickRenderableSeries />
+                <SciChart:FastLineRenderableSeries SeriesColor="#FF1919" />
             </SciChart:SciChartSurface.RenderableSeries>
 
             <!-- Create an X Axis -->
@@ -52,7 +64,10 @@
             </SciChart:SciChartSurface.ChartModifier>
             
         </SciChart:SciChartSurface>
+<<<<<<< HEAD
             <SciChart:SciChartOverview Grid.Row="2" ParentSurface="{Binding ElementName=sciChart}" DataSeriesIndex="0" SelectedRange="{Binding ElementName=sciChart, Path=XAxis.VisibleRange, Mode=TwoWay}" SciChart:ThemeManager.Theme="Electric">
         </SciChart:SciChartOverview>
+=======
+>>>>>>> origin/VolumeTask
     </Grid>
 </UserControl>
