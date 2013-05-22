@@ -11,8 +11,8 @@ namespace TradingVisualizationAssignment
 {
     public partial class MainWindow : UserControl
     {
-        public string sLocation;
-        public Boolean inMillions = true;
+        private string sLocation;
+        private Boolean inMillions = true;
 
         public MainWindow()
         {
@@ -71,16 +71,7 @@ namespace TradingVisualizationAssignment
         //Return relevant data set
         private DataSeriesSet<DateTime, double> ReadStockData(String sFileName)
         {
-<<<<<<< HEAD
             //local variables and structures
-=======
-            //Data structure to return
-            var dataSeriesSet = new DataSeriesSet<DateTime, double>();
-            var series = dataSeriesSet.AddSeries<OhlcDataSeries<DateTime, double>>();
-            var seriesLine = dataSeriesSet.AddSeries();
-
-            //local variables declarations
->>>>>>> origin/VolumeTask
             string sFile;
             int nRow = 0;
             string sStockFile = sLocation + "\\" + sFileName;
@@ -93,6 +84,8 @@ namespace TradingVisualizationAssignment
             //Data structure to return
             var dataSeriesSet = new DataSeriesSet<DateTime, double>();
             var series = dataSeriesSet.AddSeries<OhlcDataSeries<DateTime, double>>();
+            var seriesLine = dataSeriesSet.AddSeries();
+            seriesLine.SeriesName = "Volume";
 
             //reading stock file
             using (StreamReader sr = new StreamReader(sStockFile))
@@ -103,7 +96,6 @@ namespace TradingVisualizationAssignment
             {
                 if (row == "") continue;
                 string[] columns = row.Split((','));
-<<<<<<< HEAD
                 if (nRow++ == 0) //(Sort of) Check of the data file structure
                 {
                     if (!columns[0].Substring(0, 4).Equals("DATE", StringComparison.InvariantCultureIgnoreCase) ||
@@ -113,7 +105,7 @@ namespace TradingVisualizationAssignment
                     !columns[4].Substring(0, 5).Equals("CLOSE", StringComparison.InvariantCultureIgnoreCase) ||
                     !columns[5].Substring(0, 6).Equals("VOLUME", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        MessageBoxResult result = MessageBox.Show("Your source data file doesn't have the required structure!\nPlease, re-check your file.\nAborting!", "Data structure error!"); 
+                        MessageBoxResult result = MessageBox.Show("Your source data file doesn't have the required structure!\nPlease, re-check your file.\nAborting!", "Data structure error!");
                         dataSeriesSet = null;
                         break;
                     }
@@ -129,29 +121,28 @@ namespace TradingVisualizationAssignment
                     nVolume = Convert.ToInt32(columns[5]);
 
                     //Add the row to the list
-                    listStock.Add(new Tuple<DateTime, double, double, double, double, int> (xAxis, dOpen, dHigh, dLow, dClose, nVolume));
+                    listStock.Add(new Tuple<DateTime, double, double, double, double, int>(xAxis, dOpen, dHigh, dLow, dClose, nVolume));
                 }
                 catch
                 {
-                    MessageBoxResult result = MessageBox.Show("Your source file contains some data which is not of the required data type!\nPlease, re-check your file.\nAborting!", "Data type error!"); 
+                    MessageBoxResult result = MessageBox.Show("Your source file contains some data which is not of the required data type!\nPlease, re-check your file.\nAborting!", "Data type error!");
                     dataSeriesSet = null;
                     break;
-=======
-                series.Append(DateTime.Parse(columns[0]), Convert.ToDouble(columns[1]), Convert.ToDouble(columns[2]),
-                    Convert.ToDouble(columns[3]), Convert.ToDouble(columns[4]));
-                if (inMillions)
-                {
-                    seriesLine.Append(DateTime.Parse(columns[0]), Convert.ToDouble(columns[5]) / 1000000);
-                }
-                else
-                {
-                    seriesLine.Append(DateTime.Parse(columns[0]), Convert.ToDouble(columns[5]));
->>>>>>> origin/VolumeTask
                 }
             }
             listStock.Sort(Comparer<Tuple<DateTime, double, double, double, double, int>>.Default); //sort and set as source
             foreach(Tuple<DateTime, double, double, double, double, int> newLine in listStock)
+            {
                 series.Append(newLine.Item1, newLine.Item2, newLine.Item3, newLine.Item4, newLine.Item5);
+                if (inMillions)
+                {
+                    seriesLine.Append(newLine.Item1, newLine.Item6 / 1000000);
+                }
+                else
+                {
+                    seriesLine.Append(newLine.Item1, newLine.Item6);
+                }
+            }
             return dataSeriesSet;
         }
     }
