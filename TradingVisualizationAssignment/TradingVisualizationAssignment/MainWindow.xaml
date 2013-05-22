@@ -24,7 +24,7 @@
             <!-- Declare RenderableSeries -->
             <SciChart:SciChartSurface.RenderableSeries>
                 <SciChart:FastCandlestickRenderableSeries />
-                <SciChart:FastLineRenderableSeries SeriesColor="#FF1919" />
+                <SciChart:FastLineRenderableSeries SeriesColor="Green" />
             </SciChart:SciChartSurface.RenderableSeries>
 
             <!-- Create an X Axis -->

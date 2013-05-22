@@ -1,4 +1,15 @@
-﻿using System;
+﻿/**********************************************************************
+ * Created by : Nenad Samardzic
+ * Dates      : 05/02/2013 - 05/22/2013
+ * Description: The application represents C# stock/trading visualization assignment.
+ * Idea       : Visual Studio C# WPF project utilizes a SciChart visualization component
+ *              in order to displays stock market data and specific technical indicators.
+ *              It utilizes OHLC Data Series to visualize prices and simple line series
+ *              to visualize volumes data.
+ * Parameters : Application uses external data sources - .csv files.
+ **********************************************************************/
+
+using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
